@@ -1,10 +1,12 @@
 package br.com.raniel.viagens.ui.activity;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +23,8 @@ import br.com.raniel.viagens.util.DiasUtil;
 import br.com.raniel.viagens.util.MoedaUtil;
 import br.com.raniel.viagens.util.ResourceUtil;
 
+import static br.com.raniel.viagens.ui.activity.PacoteActivityConstantes.CHAVE_PACOTE;
+
 public class ResumoPacoteActivity extends AppCompatActivity {
 
     public static final String TITULO_APPBAR = "Resumo do Pacote";
@@ -30,11 +34,40 @@ public class ResumoPacoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resumo_pacote);
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
         setTitle(TITULO_APPBAR);
 
-        Pacote pacote = new Pacote("São Paulo", "sao_paulo_sp",
-                2, new BigDecimal("243.99"));
+        carregaPacoteRecebido();
+    }
 
+    private void carregaPacoteRecebido() {
+        Intent intent = getIntent();
+        if (intent.hasExtra("pacote")) {
+            final Pacote pacote = (Pacote) intent.getSerializableExtra(CHAVE_PACOTE);
+
+            inicializaCampos(pacote);
+            configuraBotao(pacote);
+        }
+    }
+
+    private void configuraBotao(final Pacote pacote) {
+        Button botaoRealizaPagamento = findViewById(R.id.resumo_pacote_botao_realiza_pagamento);
+        botaoRealizaPagamento.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                vaiParaPagemnto(pacote);
+            }
+        });
+    }
+
+    private void vaiParaPagemnto(Pacote pacote) {
+        Intent intent = new Intent(ResumoPacoteActivity.this, PagamentoActivity.class);
+        intent.putExtra(CHAVE_PACOTE, pacote);
+        startActivity(intent);
+    }
+
+    private void inicializaCampos(Pacote pacote) {
         mostraLocal(pacote);
         mostraImagem(pacote);
         mostraDias(pacote);
